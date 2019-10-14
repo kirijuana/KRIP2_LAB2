@@ -20,28 +20,105 @@ namespace KRIP2_LAB2
 
         private void button1_Click(object sender, EventArgs e)
         {
+            BigInteger E = BigInteger.Parse(textBox1.Text), N = BigInteger.Parse(textBox7.Text);            
+
+
+            // шифрование
+
+                string BinaryValue = null;
+                BigInteger x1 = 0;
+                while (E > 0)
+                {
+
+                    x1 = E % 2;
+                    if (E == 0)
+                        break;
+                    BinaryValue = BinaryValue + x1.ToString();
+                    E /= 2;
+                    //    x = Math.Truncate(x);
+                }
+
+            String open_text = (textBox5.Text);
+            byte[] asciiBytes_open = Encoding.Unicode.GetBytes(open_text);
+            byte[] asciiBytes_shifr = new byte[asciiBytes_open.Length];
+
+            for (int i = 0; i < open_text.Length/*asciiBytes_open.Length*/; i++)
+            {
+
+                int n = BinaryValue.Length;
+
+                BigInteger c = 1, s = (BigInteger)open_text[i];
+                for (int j = 0; j < n; j++)
+                {
+                    if (BinaryValue[j] == '1')
+                    {
+                        c = (c * s) %  N;
+                    }
+                    s = (s * s) % N;
+                }
+                textBox6.Text = textBox6.Text + (char)c;
+            }      
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // расшифрование
+            BigInteger D = BigInteger.Parse(textBox4.Text), N = BigInteger.Parse(textBox7.Text);
+            String shifr_text = textBox6.Text;
+            string BinaryValue_2 = null;
+            BigInteger x2 = 0;
+            while (D > 0)
+            {
+                x2 = D % 2;
+                if (D == 0)
+                    break;
+                BinaryValue_2 = BinaryValue_2 + x2.ToString();
+                D /= 2;
+            }
+
+
+            for (int i = 0; i < shifr_text.Length; i++)
+            {
+
+                int n = BinaryValue_2.Length;
+
+                BigInteger m = 1, s = (BigInteger)shifr_text[i];
+                for (int j = 0; j < n; j++)
+                {
+                    if (BinaryValue_2[j] == '1')
+                    {
+                        m = (m * s) % N;
+                    }
+                    s = (s * s) % N;
+                }
+                textBox5.Text = textBox5.Text + (char)m;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
             BigInteger P = BigInteger.Parse(textBox3.Text), E = 0, Q = BigInteger.Parse(textBox2.Text);
             BigInteger N = 0, Z = 0;
+          
             N = P * Q;
+            textBox7.Text = N.ToString();
             Z = (P - 1) * (Q - 1);
 
             // нахождение простого числа E
-            
-            bool[] is_prime = new bool[(int)N + 1];
-            for (int i = 2; i <= N; ++i)
-                is_prime[i] = true;
+            bool check = false;
 
-            List<int> primes = new List<int>();
-
-            for (int i = 2; i <= N; ++i)
-                if (is_prime[i])
+            for (int i = (int)N - 1; i >= 2; i--)
+            {
+                E = i + 1;
+                if (check)
+                    break;
+                check = true;
+                for (int j = 2; j <= (int)(i / 2); j++)
                 {
-                    primes.Add(i);
-                    E = i;
-                    if (i * i <= N)
-                        for (int j = i * i; j <= N; j += i)
-                            is_prime[j] = false;
+                    if (i % j == 0)
+                        check = false;
                 }
+            }
 
             BigInteger ost = 0, ost_2 = 0, mul = 0, a1 = 0, b1 = 0;
             //проверка на взаимную простоту
@@ -79,17 +156,9 @@ namespace KRIP2_LAB2
                     b1 = ost;
                 }
 
-                if(ost_2 != 1)
+                if (ost_2 != 1)
                 {
-                    
-                    for (int i = (int)E - 1; i > 2; i--)
-                    {
-                        if(is_prime[i])
-                        {
-                            E = i;
-                            break;
-                        }
-                    }
+
                 }
             }
             textBox1.Text = E.ToString();
@@ -122,83 +191,6 @@ namespace KRIP2_LAB2
             if (D < 0)
                 D += a1;
             textBox4.Text = D.ToString();
-
-
-            // шифрование
-
-                string BinaryValue = null;
-                BigInteger x1 = 0;
-                while (E > 0)
-                {
-
-                    x1 = E % 2;
-                    if (E == 0)
-                        break;
-                    BinaryValue = BinaryValue + x1.ToString();
-                    E /= 2;
-                    //    x = Math.Truncate(x);
-                }
-
-            String open_text = (textBox5.Text), shifr_text = "";
-            byte[] asciiBytes_open = Encoding.ASCII.GetBytes(open_text);
-            byte[] asciiBytes_shifr = new byte[asciiBytes_open.Length];
-
-            for (int i = 0; i < asciiBytes_open.Length; i++)
-            {
-
-                int n = BinaryValue.Length;
-
-                BigInteger c = 1, s = asciiBytes_open[i];
-                for (int j = 0; j < n; j++)
-                {
-                    if (BinaryValue[j] == '1')
-                    {
-                        c = (c * s) %  N;
-                    }
-                    s = (s * s) % N;
-                }
-                asciiBytes_shifr[i] = (byte)c;
-                
-                
-            }
-            shifr_text = System.Text.Encoding.ASCII.GetString(asciiBytes_shifr);
-
-            // расшифрование
-
-            byte[] asciiBytes_shifr_2 = Encoding.ASCII.GetBytes(shifr_text);
-          
-            string BinaryValue_2 = null;
-            BigInteger x2 = 0;
-            while (D > 0)
-            {
-
-                x2 = D % 2;
-                if (D == 0)
-                    break;
-                BinaryValue_2 = BinaryValue_2 + x2.ToString();
-                D /= 2;
-                //    x = Math.Truncate(x);
-            }
-
-            String open_text_2 = "";
-            for (int i = 0; i < asciiBytes_shifr_2.Length; i++)
-            {
-
-                int n = BinaryValue_2.Length;
-
-                BigInteger m = 1, s = asciiBytes_shifr_2[i];
-                for (int j = 0; j < n; j++)
-                {
-                    if (BinaryValue_2[j] == '1')
-                    {
-                        m = (m * s) % N;
-                    }
-                    s = (s * s) % N;
-                }
-                asciiBytes_shifr_2[i] = (byte)m;
-            }
-            open_text_2 = System.Text.Encoding.ASCII.GetString(asciiBytes_shifr_2);
         }
-
     }
 }
