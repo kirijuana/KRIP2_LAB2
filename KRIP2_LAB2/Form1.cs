@@ -20,23 +20,24 @@ namespace KRIP2_LAB2
 
         private void button1_Click(object sender, EventArgs e)
         {
-            BigInteger E = BigInteger.Parse(textBox1.Text), N = BigInteger.Parse(textBox7.Text);            
+            BigInteger E = BigInteger.Parse(textBox1.Text), N = BigInteger.Parse(textBox7.Text);
 
+            char[] alph = "-абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ".ToCharArray();
 
             // шифрование
 
-                string BinaryValue = null;
-                BigInteger x1 = 0;
-                while (E > 0)
-                {
+            string BinaryValue = null;
+            BigInteger x1 = 0;
+            while (E > 0)
+            {
 
-                    x1 = E % 2;
-                    if (E == 0)
-                        break;
-                    BinaryValue = BinaryValue + x1.ToString();
-                    E /= 2;
-                    //    x = Math.Truncate(x);
-                }
+                x1 = E % 2;
+                if (E == 0)
+                    break;
+                BinaryValue = BinaryValue + x1.ToString();
+                E /= 2;
+                //    x = Math.Truncate(x);
+            }
 
             String open_text = (textBox5.Text);
             byte[] asciiBytes_open = Encoding.Unicode.GetBytes(open_text);
@@ -46,24 +47,32 @@ namespace KRIP2_LAB2
             {
 
                 int n = BinaryValue.Length;
-
                 BigInteger c = 1, s = (BigInteger)open_text[i];
+                for (int j = 0; j < alph.Length; j++)
+                {
+                    if (open_text[i] == alph[j])
+                    {
+                        s = j;
+                    }
+                }
+
                 for (int j = 0; j < n; j++)
                 {
                     if (BinaryValue[j] == '1')
                     {
-                        c = (c * s) %  N;
+                        c = (c * s) % N;
                     }
                     s = (s * s) % N;
                 }
                 textBox6.Text = textBox6.Text + (char)c;
-            }      
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             // расшифрование
             BigInteger D = BigInteger.Parse(textBox4.Text), N = BigInteger.Parse(textBox7.Text);
+            char[] alph = "-абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ".ToCharArray();
             String shifr_text = textBox6.Text;
             string BinaryValue_2 = null;
             BigInteger x2 = 0;
@@ -91,7 +100,7 @@ namespace KRIP2_LAB2
                     }
                     s = (s * s) % N;
                 }
-                textBox5.Text = textBox5.Text + (char)m;
+                textBox5.Text = textBox5.Text + alph[(int)m];
             }
         }
 
@@ -99,72 +108,145 @@ namespace KRIP2_LAB2
         {
             BigInteger P = BigInteger.Parse(textBox3.Text), E = 0, Q = BigInteger.Parse(textBox2.Text);
             BigInteger N = 0, Z = 0;
-          
+            BigInteger ost = 0, ost_2 = 0, mul = 0, a1 = 0, b1 = 0;
             N = P * Q;
             textBox7.Text = N.ToString();
             Z = (P - 1) * (Q - 1);
+            textBox8.Text = Z.ToString();
 
             // нахождение простого числа E
-            bool check = false;
+            // bool check = false;
+            //   E = Z - 1;
+            E = Z;
 
-            for (int i = (int)N - 1; i >= 2; i--)
-            {
-                E = i + 1;
-                if (check)
-                    break;
-                check = true;
-                for (int j = 2; j <= (int)(i / 2); j++)
-                {
-                    if (i % j == 0)
-                        check = false;
-                }
-            }
+            //for (BigInteger i = E - 1; i >= 2; i--)
+            //{
+            //    if (check)
+            //    {
+            //        E = i + 1;
+            //        break;
+            //    }
+            //    check = true;
+            //    for (int j = 2; j <= (i / 2); j++)
+            //    {
+            //        if (i % j == 0)
+            //            check = false;
+            //    }
+            //}
 
-            BigInteger ost = 0, ost_2 = 0, mul = 0, a1 = 0, b1 = 0;
-            //проверка на взаимную простоту
-            while (ost_2 != 1)
+            bool[] table;
+            List<BigInteger> primearray;
+            if (Z < 3000000)
             {
-                if (E > Z)
+                table = new bool[(ulong)Z];
+                primearray = new List<BigInteger>();
+                for (BigInteger i = 0; i < Z; i++)
+                    table[(ulong)i] = true;
+                for (BigInteger i = 2; i * i < Z; i++)
+                    if (table[(ulong)i])
+                        for (var j = 2 * i; j < Z; j += i)
+                            table[(ulong)j] = false;
+                for (BigInteger i = 1; i < Z; i++)
                 {
-                    ost = E; ost_2 = 0; mul = 1; a1 = E; b1 = Z;
-                }
-                else
-                {
-                    ost = Z; ost_2 = 0; mul = 1; a1 = Z; b1 = E;
-                }
-                while (ost != 0)
-                {
-                    mul = 1;
-                    if (b1 * 2 < a1)
+                    if (table[(ulong)i])
                     {
-                        mul = 2;
-                        for (int i = 3; ; i++)
-                        {
-                            if (b1 * i < a1)
-                            {
-                                mul = i;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
+                        primearray.Add(i);
                     }
-                    ost_2 = ost;
-                    ost = a1 - b1 * mul;
-                    a1 = b1;
-                    b1 = ost;
-                }
-
-                if (ost_2 != 1)
-                {
-
                 }
             }
-            textBox1.Text = E.ToString();
+            else
+            {
+                table = new bool[(ulong)3000000];
+                primearray = new List<BigInteger>();
+                for (BigInteger i = 0; i < 3000000; i++)
+                    table[(ulong)i] = true;
+                for (BigInteger i = 2; i * i < 3000000; i++)
+                    if (table[(ulong)i])
+                        for (var j = 2 * i; j < 3000000; j += i)
+                            table[(ulong)j] = false;
+                for (BigInteger i = 1; i < 3000000; i++)
+                {
+                    if (table[(ulong)i])
+                    {
+                        primearray.Add(i);
+                    }
+                }
+            }
+
+            //for (long i = 2; i <= Z; i++)
+            //    if ((Z % i == 0) && (E % i == 0)) //если имеют общие делители
+            //    {
+            //        E--;
+            //        i = 1;
+            //    }
+
+
+            //проверка на взаимную простоту
+            BigInteger[] U_1 = new BigInteger[3];
+            BigInteger[] V_1 = new BigInteger[3];
+            BigInteger[] T_1 = new BigInteger[3];
+            do
+            {
+                //while (ost_2 != 1)
+                //{
+                Random rnd = new Random();
+
+                int value = rnd.Next(primearray.Count / 2, primearray.Count);
+                E = primearray[value];
+                //    ost = Z; ost_2 = 0; mul = 1; a1 = Z; b1 = E;                  
+                //        while (ost != 0)
+                //        {
+                //            mul = 1;
+                //            if (b1 * 2 < a1)
+                //            {
+                //                mul = 2;
+                //                for (int i = 3; ; i++)
+                //                {
+                //                    if (b1 * i < a1)
+                //                    {
+                //                        mul = i;
+                //                    }
+                //                    else
+                //                    {
+                //                        break;
+                //                    }
+                //                }
+                //            }
+                //            ost_2 = ost;
+                //            ost = a1 - b1 * mul;
+                //            a1 = b1;
+                //            b1 = ost;
+                //        }        
+
+                //}
+                U_1[0] = Z;
+                U_1[1] = 1;
+                U_1[2] = 0;
+                V_1[0] = E;
+                V_1[1] = 0;
+                V_1[2] = 1;
+                ost = Z; ost_2 = 0; mul = 1; a1 = Z; b1 = E;
+                BigInteger q_1 = 0;
+                while (V_1[0] != 0)
+                {
+
+                    q_1 = U_1[0] / V_1[0];
+                    T_1[0] = U_1[0] % V_1[0];
+                    T_1[1] = U_1[1] - q_1 * V_1[1];
+                    T_1[2] = U_1[2] - q_1 * V_1[2];
+                    U_1[0] = V_1[0];
+                    U_1[1] = V_1[1];
+                    U_1[2] = V_1[2];
+                    V_1[0] = T_1[0];
+                    V_1[1] = T_1[1];
+                    V_1[2] = T_1[1];
+                }
+                textBox1.Text = E.ToString();
+
+            } while (U_1[0] != 1);
+
 
             // вычисление D
-
             BigInteger[] U = new BigInteger[2];
             BigInteger[] V = new BigInteger[2];
             BigInteger[] T = new BigInteger[2];
@@ -173,9 +255,7 @@ namespace KRIP2_LAB2
             U[1] = 0;
             V[0] = E;
             V[1] = 1;
-            ost = Z; ost_2 = 0; mul = 1; a1 = Z; b1 = E;
-
-
+            //    ost = Z; ost_2 = 0; mul = 1; a1 = Z; b1 = E;
             BigInteger D = 0, q = 0;
             while (V[0] != 0)
             {
@@ -190,7 +270,36 @@ namespace KRIP2_LAB2
             }
             if (D < 0)
                 D += a1;
+            if (D == E)
+                D = D + Z;
             textBox4.Text = D.ToString();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            bool[] table;
+            List<BigInteger> primearray;
+
+            table = new bool[(ulong)3000000];
+            primearray = new List<BigInteger>();
+            for (BigInteger i = 0; i < 3000000; i++)
+                table[(ulong)i] = true;
+            for (BigInteger i = 2; i * i < 3000000; i++)
+                if (table[(ulong)i])
+                    for (var j = 2 * i; j < 3000000; j += i)
+                        table[(ulong)j] = false;
+            for (BigInteger i = 1; i < 3000000; i++)
+            {
+                if (table[(ulong)i])
+                {
+                    primearray.Add(i);
+                }
+            }
+            Random rnd = new Random();
+            int value = rnd.Next(0, 200);
+            textBox2.Text = primearray[value].ToString();
+            value = rnd.Next(0, 300);
+            textBox3.Text = primearray[value].ToString();
         }
     }
 }
