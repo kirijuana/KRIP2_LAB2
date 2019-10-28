@@ -64,7 +64,10 @@ namespace KRIP2_LAB2
                     }
                     s = (s * s) % N;
                 }
-                textBox6.Text = textBox6.Text + (char)c;
+                if(i + 1 == open_text.Length)
+                    textBox6.Text = textBox6.Text + c;
+                else
+                    textBox6.Text = textBox6.Text + c + ", ";
             }
         }
 
@@ -85,13 +88,15 @@ namespace KRIP2_LAB2
                 D /= 2;
             }
 
+            BigInteger[] intArray = shifr_text.Split(',').Select(x => BigInteger.Parse(x)).ToArray();
 
-            for (int i = 0; i < shifr_text.Length; i++)
+
+            for (int i = 0; i < intArray.Length; i++)
             {
 
                 int n = BinaryValue_2.Length;
 
-                BigInteger m = 1, s = (BigInteger)shifr_text[i];
+                BigInteger m = 1, s = intArray[i];
                 for (int j = 0; j < n; j++)
                 {
                     if (BinaryValue_2[j] == '1')
@@ -173,52 +178,18 @@ namespace KRIP2_LAB2
                 }
             }
 
-            //for (long i = 2; i <= Z; i++)
-            //    if ((Z % i == 0) && (E % i == 0)) //если имеют общие делители
-            //    {
-            //        E--;
-            //        i = 1;
-            //    }
-
-
             //проверка на взаимную простоту
             BigInteger[] U_1 = new BigInteger[3];
             BigInteger[] V_1 = new BigInteger[3];
             BigInteger[] T_1 = new BigInteger[3];
             do
             {
-                //while (ost_2 != 1)
-                //{
+
                 Random rnd = new Random();
 
-                int value = rnd.Next(primearray.Count / 2, primearray.Count);
+                int value = rnd.Next(0, primearray.Count);
                 E = primearray[value];
-                //    ost = Z; ost_2 = 0; mul = 1; a1 = Z; b1 = E;                  
-                //        while (ost != 0)
-                //        {
-                //            mul = 1;
-                //            if (b1 * 2 < a1)
-                //            {
-                //                mul = 2;
-                //                for (int i = 3; ; i++)
-                //                {
-                //                    if (b1 * i < a1)
-                //                    {
-                //                        mul = i;
-                //                    }
-                //                    else
-                //                    {
-                //                        break;
-                //                    }
-                //                }
-                //            }
-                //            ost_2 = ost;
-                //            ost = a1 - b1 * mul;
-                //            a1 = b1;
-                //            b1 = ost;
-                //        }        
 
-                //}
                 U_1[0] = Z;
                 U_1[1] = 1;
                 U_1[2] = 0;
@@ -296,9 +267,9 @@ namespace KRIP2_LAB2
                 }
             }
             Random rnd = new Random();
-            int value = rnd.Next(0, 200);
+            int value = rnd.Next(0, primearray.Count);
             textBox2.Text = primearray[value].ToString();
-            value = rnd.Next(0, 300);
+            value = rnd.Next(0, primearray.Count);
             textBox3.Text = primearray[value].ToString();
         }
     }
